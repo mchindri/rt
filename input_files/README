@@ -1,0 +1,21 @@
+FILE FORMAT:
+
+	LIGHT: x y z
+	SPHERE: x y z r color //x,y,z=center coordinates. r=radious
+	CONE: x1 y1 z1 x2 y2 z2 r d color //point 1=center of the cone. Point 2 = 
+		  any point of the central axis. r = radious of the point 2. d=distance
+		  between points.
+	CYLINDER: x1 y1 z1 x2 y2 z2 r color //2 points of the central axis r=radious
+	PLANE: x1 y1 z1 x2 y2 z2 x3 y3 z3 //3 points in the space
+
+Example:
+
+>user$ cat first_test.txt 
+10 10 10
+0 0 0 9 red
+1 1 1 1 1 2 6 blue
+>user$ 
+
+This file contains one red circle with the center in (0,0,0) and with the 
+radious 9. And one blue cylindre with the central axis crossing the points
+(1,1,1) and (1,1,2) with the radious 6. The ligth is in te position (10, 10, 10)
