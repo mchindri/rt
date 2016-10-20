@@ -24,7 +24,8 @@ SRC = 	main.c\
 		src/math/ft_point_sum.c\
 		src/math/ft_point_prod.c\
 		src/math/ft_distance.c\
-		src/mlx_pixel_put_to_image.c\
+		src/math/ft_cos_btw_vectors.c\
+		src/mlx_pixel_put_to_image.c
 
 FLAGS = -Wall -Wextra -Werror	
 NAME = rt
@@ -56,6 +57,6 @@ fclean: clean
 re: clean all
 
 test: re
-	./rt input_files/test.txt
+	./rt input_files/scene1.txt
 
 

@@ -12,6 +12,7 @@
 #define POINT(a) {ft_putstr(#a);dprintf(2,": x=%lf, y=%lf, z=%lf\n",a.x, a.y, a.z);}
 #define STOP {char c;scanf("%c", &c);}
 #define EXIT {exit(0);}
+#define STR(x) {ft_putstr(x);}
 
 #endif
 

@@ -6,43 +6,87 @@
  *
  * scalar prod with -1 on the ray make the ray start on the window pixel
  */
-
-int	ft_get_pixel_color(t_data *data, t_point win_pixel)
+t_point		ft_intersect_elem(t_data *data, t_ray ray, int *ref, double *dis)
 {
-	t_ray	ray;
 	int		i;
-	double	min_dis;
-	t_point	intersection[2];
-	double	distance;
-	int		i_ref;
+	double	dis_aux;
+	t_point	inter;
+	t_point	inter_aux;
 
-	ray = ft_get_ray(win_pixel, data->cam);
-	ray.dir = ft_vect_scalar_prod(-1, ray.dir);
 	i = 0;
-	min_dis = -1;
+	*dis = -1;
+	ft_bzero(&inter, sizeof(inter));
 	while (i < data->nb_elem)
 	{
-		distance = ft_intersect(ray, data->elements[i], &(intersection[1]), 
-							win_pixel);
-		if (distance >= 0)
+		dis_aux = ft_intersect(ray, data->elements[i], &inter_aux);
+		if (dis_aux >= 0)
 		{
-			if (min_dis < 0)
+			if (*dis < 0)
 			{
-				i_ref = i;
-				min_dis = distance;
-				intersection[0] = intersection[1];
+				*ref = i;
+				*dis = dis_aux;
+				inter = inter_aux;
 			}
-			else if (distance < min_dis)
+			else if (dis_aux < *dis)
 			{
-				i_ref = i;
-				min_dis = distance;
-				intersection[0] = intersection[1];
+				*ref = i;
+				*dis = dis_aux;
+				inter = inter_aux;
 			}
 		}
 		i++;
 	}
-	if (min_dis > 0)
-	//if (ft_has_light(intersection[0], data))
-		return data->elements[i_ref].color;
-	return 0x000000;
+	return (inter);	
+}
+
+void		ft_intersect_light(t_data *data, t_ray ray, int *ref, double *dis)
+{
+	int			i;
+	double		dis_aux;
+	t_vector	aux;
+
+	i = 0;
+	*dis = -1;
+	*ref = -1;
+	while (i < data->nb_lights)
+	{	
+		aux = ft_create_vector(ray.a, data->lights[i]);
+		if (ft_cos_btw_vectors(aux, ray.dir) == 1)
+		{
+			dis_aux = ft_distance(data->lights[i], ray.a);
+			if (*dis < 0)
+			{
+				*ref = i;
+				*dis = dis_aux;
+			}
+			else if (dis_aux < *dis)
+			{
+				*ref = i;
+				*dis = dis_aux;
+			}
+		}
+		i++;
+	}
+}
+
+int			ft_get_pixel_color(t_data *data, t_point win_pixel)
+{
+	t_ray	ray;
+	t_point	inter;
+	double	dist[2];
+	int		i[2];
+
+	ray = ft_get_ray(data->cam, win_pixel);
+	ray.a = win_pixel;
+	inter = ft_intersect_elem(data, ray, i, dist);
+	ft_intersect_light(data, ray, i + 1, dist + 1);
+	if ((dist[0] < dist[1] || dist[1] == -1) && dist[0] > -1)
+	{
+	//if (dist[0] > -1)
+		if (ft_has_light(inter, i[0], data))
+			return (data->elements[i[0]].color);
+	}
+	else if (dist[1] > 0)
+		return (0x00ffffff);
+	return (0x000000);
 }

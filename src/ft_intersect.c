@@ -1,7 +1,6 @@
 #include "rt.h"
 
-static t_point *ft_intersect_cyl(t_ray ray, t_element elem, int *n,
-					t_point win_pix)
+static t_point *ft_intersect_cyl(t_ray ray, t_element elem, int *n)
 {
 	t_vector	aux[3];
 	double		eq[3];
@@ -29,12 +28,11 @@ static t_point *ft_intersect_cyl(t_ray ray, t_element elem, int *n,
 		sol[i].z = ray.a.z + t[i] * ray.dir.g;
 		i++;
 	}
-	ft_validate_solution(&sol, ray, win_pix, n);
+	ft_validate_solution(&sol, ray, n);
 	return (sol);
 }
 
-static t_point *ft_intersect_cone(t_ray ray, t_element elem, int *n,
-					t_point win_pix)
+static t_point *ft_intersect_cone(t_ray ray, t_element elem, int *n)
 {
 	double		eq[3];
 	double		aux[4];
@@ -45,7 +43,7 @@ static t_point *ft_intersect_cone(t_ray ray, t_element elem, int *n,
 
 	aux[2] = elem.cos_alfa * elem.cos_alfa;
 	aux[3] = elem.sin_alfa * elem.sin_alfa;
-	v[2] = ft_create_vector(ray.a, elem.center);
+	v[2] = ft_create_vector(elem.center, ray.a);
 	aux[0] = ft_vect_dot_prod(ray.dir, elem.dir);
 	aux[1] = ft_vect_dot_prod(v[2], elem.dir);
 	v[0] = ft_vect_substract(ray.dir, ft_vect_scalar_prod(aux[0], elem.dir));
@@ -66,11 +64,10 @@ static t_point *ft_intersect_cone(t_ray ray, t_element elem, int *n,
 		sol[i].z = ray.a.z + t[i] * ray.dir.g;
 		i++;
 	}
-	ft_validate_solution(&sol, ray, win_pix, n);
+	ft_validate_solution(&sol, ray, n);
 	return (sol);
 }
-static t_point *ft_intersect_plane(t_ray ray, t_element elem, int *n,
-					t_point win_pix)
+static t_point *ft_intersect_plane(t_ray ray, t_element elem, int *n)
 {
 	double	t;
 	double	aux1;
@@ -93,22 +90,20 @@ static t_point *ft_intersect_plane(t_ray ray, t_element elem, int *n,
 	inter->x = ray.a.x + t * ray.dir.a;
 	inter->y = ray.a.y + t * ray.dir.b;
 	inter->z = ray.a.z + t * ray.dir.g;
-	ft_validate_solution(&inter, ray, win_pix, n);
+	ft_validate_solution(&inter, ray,  n);
 	return(inter);
 }
 
-static t_point *ft_intersect_sphere(t_ray ray, t_element elem, int *n,
-					t_point win_pix)
+static t_point *ft_intersect_sphere(t_ray ray, t_element elem, int *n)
 {
 	double	*t;
 	double	ec[3];
 	t_point	*inter;
-	double	sol[3];
 	int		i;
 	t_vector	aux;
 	
 	ec[0] = ft_vect_dot_prod(ray.dir, ray.dir);
-	aux = ft_create_vector(ray.a, elem.center);
+	aux = ft_create_vector(elem.center, ray.a);
 	ec[1] = 2 * ft_vect_dot_prod(ray.dir, aux);
 	ec[2] = ft_vect_dot_prod(aux, aux) - (elem.r * elem.r);
 	t = ft_solve_equation(ec[0], ec[1], ec[2], n);
@@ -118,13 +113,12 @@ static t_point *ft_intersect_sphere(t_ray ray, t_element elem, int *n,
 	i = 0;
 	while (i < *n)
 	{
-		sol[0] = ray.a.x + t[i] * ray.dir.a;
-		sol[1] = ray.a.y + t[i] * ray.dir.b;
-		sol[2] = ray.a.z + t[i] * ray.dir.g;
-		inter[i] = ft_create_point(sol[0], sol[1], sol[2]);
+		inter[i].x = ray.a.x + t[i] * ray.dir.a;
+		inter[i].y = ray.a.y + t[i] * ray.dir.b;
+		inter[i].z = ray.a.z + t[i] * ray.dir.g;
 		i++;
 	}
-	ft_validate_solution(&inter, ray, win_pix, n);
+	ft_validate_solution(&inter, ray, n);
 	return (inter);
 }
 
@@ -133,7 +127,7 @@ static t_point *ft_intersect_sphere(t_ray ray, t_element elem, int *n,
  * with the elemenet
  */
 
-double ft_intersect(t_ray ray, t_element elem, t_point *point, t_point win_pix)
+double ft_intersect(t_ray ray, t_element elem, t_point *point)
 {
 	t_point *inter;
 	int		nb_inter;
@@ -141,17 +135,17 @@ double ft_intersect(t_ray ray, t_element elem, t_point *point, t_point win_pix)
 	float	d2;
 
 	if (elem.type == CYLINDER)
-		inter = ft_intersect_cyl(ray, elem, &nb_inter, win_pix);
+		inter = ft_intersect_cyl(ray, elem, &nb_inter);
 	else if (elem.type == CONE)
-		inter = ft_intersect_cone(ray, elem, &nb_inter, win_pix);
+		inter = ft_intersect_cone(ray, elem, &nb_inter);
 	else if (elem.type == PLANE)
-		inter = ft_intersect_plane(ray, elem, &nb_inter, win_pix);
+		inter = ft_intersect_plane(ray, elem, &nb_inter);
 	else if (elem.type == SPHERE)
-		inter = ft_intersect_sphere(ray, elem, &nb_inter, win_pix);
+		inter = ft_intersect_sphere(ray, elem, &nb_inter);
 	else
 		ft_error("different element type\n");
 	if (nb_inter == 0)
-		return -1;
+		return (-1);
 	else if (nb_inter == 1)
 	{
 		*point = *inter;

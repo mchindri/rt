@@ -91,10 +91,10 @@ int		ft_read_data(char *file, t_data *data);
 void	ft_draw_scene(t_data *data);
 void	ft_preset_data(t_data *data);
 int		ft_get_pixel_color(t_data *data, t_point win_pix);
-double	ft_intersect(t_ray ray, t_element elem, t_point *point, t_point win_pi);
-t_bool	ft_has_light(t_point point, t_data *data);
+double	ft_intersect(t_ray ray, t_element elem, t_point *point);
+t_bool	ft_has_light(t_point point, int i_ref, t_data *data);
 t_ray	ft_get_ray(t_point a, t_point b);
-void	ft_validate_solution(t_point **sol, t_ray ray, t_point win_pix, int *n);
+void	ft_validate_solution(t_point **sol, t_ray ray, int *n);
 
 t_point		ft_point_sum(t_point a, t_point b);
 t_point		ft_point_prod(double k, t_point a);
@@ -108,6 +108,7 @@ t_vector	ft_vect_substract(t_vector a, t_vector b);
 t_vector	ft_create_vector(t_point a, t_point b);
 void		ft_vect_normalize(t_vector *a);
 double		ft_distance(t_point a, t_point b);
+double		ft_cos_btw_vectors(t_vector a, t_vector b);
 
 int		get_color(char *color);
 void	ft_usage();
